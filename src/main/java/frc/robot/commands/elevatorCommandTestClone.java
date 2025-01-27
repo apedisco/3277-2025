@@ -18,7 +18,7 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class elevatorCommandTest extends Command {
+public class elevatorCommandTestClone extends Command {
 
   ElevatorSubsystem m_ElevatorSubsystem;
 
@@ -37,7 +37,7 @@ public class elevatorCommandTest extends Command {
   private boolean whileBreak;
 
   /** Creates a new elevatorCommand. */
-  public elevatorCommandTest(ElevatorSubsystem elevatorSubsystem, double motor1position, Joystick elevatorJoystick){
+  public elevatorCommandTestClone(ElevatorSubsystem elevatorSubsystem, double motor1position, Joystick elevatorJoystick){
     m_ElevatorSubsystem = elevatorSubsystem;
     addRequirements(m_ElevatorSubsystem);
 
@@ -71,7 +71,7 @@ public class elevatorCommandTest extends Command {
     TestMotor1Position = m_ElevatorSubsystem.m_TestMotor1.getRotorPosition().getValueAsDouble();
     TestMotor2Position = m_ElevatorSubsystem.m_TestMotor2.getRotorPosition().getValueAsDouble();
 
-    error = ((TestMotor1Position+(-2)));
+    error = ((TestMotor1Position+(-3)));
 
     if (errordistance <= .01 && slowTimeCheck){
       slowTime = System.currentTimeMillis();
@@ -80,7 +80,7 @@ public class elevatorCommandTest extends Command {
       slowTimeCheck = false;
     }
 
-    if(errordistance <= .01 && (System.currentTimeMillis() - slowTime) > 20000 ){
+    if(errordistance <= .01 && (System.currentTimeMillis() - slowTime) > 2000 ){
       m_ElevatorSubsystem.m_TestMotor1.set(0.035);
       m_ElevatorSubsystem.m_TestMotor2.set(0.035);
       System.out.println("holding");
@@ -94,7 +94,7 @@ public class elevatorCommandTest extends Command {
     // P = (TestMotor1Position+(-1))*.2
     // D = (error - lastError)) / ((System.currentTimeMillis()-engagetime)/1000)
 
-    out = (-.025) + ((((TestMotor1Position+-2)))* .035) - ((0.001 * (error - lastError)) / ((System.currentTimeMillis()-engagetime)/1000));//.115 P
+    out = (-.025) + ((((TestMotor1Position+-3)))* .045) - ((0.001 * (error - lastError)) / ((System.currentTimeMillis()-engagetime)/1000));//.115 P
     m_ElevatorSubsystem.m_TestMotor1.set(-out);
     m_ElevatorSubsystem.m_TestMotor2.set(-out);
 
@@ -105,7 +105,7 @@ public class elevatorCommandTest extends Command {
 
     TestMotor1Position = m_ElevatorSubsystem.m_TestMotor1.getRotorPosition().getValueAsDouble();
     
-    lastError = ((TestMotor1Position+(-2)));
+    lastError = ((TestMotor1Position+(-3)));
 
     SmartDashboard.putNumber("Power out", out);
     SmartDashboard.putNumber("Test Motor 1 Position", TestMotor1Position);

@@ -17,8 +17,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.TestElevator;
 import frc.robot.commands.elevatorCommand;
 import frc.robot.commands.elevatorCommandTest;
+import frc.robot.commands.elevatorCommandTestClone;
+import frc.robot.commands.elevatorPIDCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -36,7 +39,7 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandJoystick m_DriveJoystick = new CommandJoystick(0);
+   // private final CommandJoystick m_DriveJoystick = new CommandJoystick(0);
     private final Joystick m_ElevatorJoystick = new Joystick(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
@@ -45,22 +48,27 @@ public class RobotContainer {
     public RobotContainer() {
         configureBindings();
          final JoystickButton testButton = new JoystickButton(m_ElevatorJoystick, 1);
-         final JoystickButton test2Button = new JoystickButton(m_ElevatorJoystick, 3);
-        testButton.whileTrue(new elevatorCommand(m_ElevatorSubsystem, MaxAngularRate, m_ElevatorJoystick));
+         final JoystickButton test2Button = new JoystickButton(m_ElevatorJoystick, 2);
+         final JoystickButton test3Button = new JoystickButton(m_ElevatorJoystick, 3);
+        //testButton.whileTrue(new elevatorCommand(m_ElevatorSubsystem, MaxAngularRate, m_ElevatorJoystick));
         test2Button.whileTrue(new elevatorCommandTest(m_ElevatorSubsystem, MaxAngularRate, m_ElevatorJoystick));
+        testButton.whileTrue(new elevatorCommandTestClone(m_ElevatorSubsystem, MaxAngularRate, m_ElevatorJoystick));
+        test3Button.whileTrue(new elevatorCommand(m_ElevatorSubsystem, MaxAngularRate, m_ElevatorJoystick));
+        
+
     }
 
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-m_DriveJoystick.getY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-m_DriveJoystick.getX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-m_DriveJoystick.getTwist() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-        );
+        // drivetrain.setDefaultCommand(
+        //     // Drivetrain will execute this command periodically
+        //     drivetrain.applyRequest(() ->
+        //         drive.withVelocityX(-m_DriveJoystick.getY() * MaxSpeed) // Drive forward with negative Y (forward)
+        //             .withVelocityY(-m_DriveJoystick.getX() * MaxSpeed) // Drive left with negative X (left)
+        //             .withRotationalRate(-m_DriveJoystick.getTwist() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+        //     )
+        // );
 
        /* m_DriveJoystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
         m_DriveJoystick.b().whileTrue(drivetrain.applyRequest(() ->

@@ -70,7 +70,7 @@ public class elevatorCommand extends Command {
   public void execute() {
     motor1position = m_ElevatorSubsystem.m_ElevatorMotor1.getRotorPosition().getValueAsDouble();
 
-    m_ElevatorSubsystem.m_ElevatorMotor1.setControl(m_request.withPosition(10));
+    // m_ElevatorSubsystem.m_ElevatorMotor1.setControl(m_request.withPosition(10));
 
     //m_ElevatorSubsystem.m_ElevatorMotor1.set((((m_ElevatorJoystick.getRawAxis(3) + 1) / 2)*.5));
     //toConfigure.Slot0.kP = (((m_ElevatorJoystick.getRawAxis(3) + 1) / 2)*.5);
@@ -87,7 +87,8 @@ public class elevatorCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_ElevatorSubsystem.m_ElevatorMotor1.set(0);
+    m_ElevatorSubsystem.m_TestMotor1.set(0);
+    m_ElevatorSubsystem.m_TestMotor2.set(0);
   }
 
   // Returns true when the command should end.

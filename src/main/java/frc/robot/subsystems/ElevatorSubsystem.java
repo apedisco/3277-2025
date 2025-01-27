@@ -11,17 +11,21 @@ import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ElevatorSubsystem extends SubsystemBase {
   
   public TalonFX m_ElevatorMotor1 = new TalonFX(9);
   public TalonFX m_ElevatorMotor2 = new TalonFX(10);
+  public TalonFX m_TestMotor1 = new TalonFX(11);
+  public TalonFX m_TestMotor2 = new TalonFX(12);
   TalonFXConfiguration toConfigure = new TalonFXConfiguration();
   public int MasterID = 9;
   public boolean OpposeMasterDirection = false;
-  private double followerUpdateFreq = 1000;
-  public Follower mootor2 = new Follower(MasterID, OpposeMasterDirection);
+  public Follower motor2 = new Follower(MasterID, OpposeMasterDirection);
+  public double TestMotor1Position;
+  public double TestMotor2Position;
   //public StatusCode setControl(Follower request);
   
   
@@ -29,6 +33,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   /** Creates a new ElevatorSubsystem. */
   public ElevatorSubsystem() {
+    // m_TestMotor1.setInverted(true);
+    // m_TestMotor2.setInverted(true);
+    m_TestMotor1.setPosition(0);
+    m_TestMotor2.setPosition(0);
+    
 
   
 
@@ -40,7 +49,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   // m_ElevatorMotor1.getConfigurator().apply(toConfigure);
   m_ElevatorMotor2.getConfigurator().apply(toConfigure);
-  
+
+  TestMotor1Position = m_TestMotor1.getRotorPosition().getValueAsDouble();
+  TestMotor2Position = m_TestMotor2.getRotorPosition().getValueAsDouble();
+  SmartDashboard.putNumber("Test Motor 1 Position", TestMotor1Position);
+  SmartDashboard.putNumber("Test Motor 2 Position", TestMotor2Position);
   }
 
   @Override
