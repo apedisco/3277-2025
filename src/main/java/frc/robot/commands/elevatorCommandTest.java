@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.ElevatorSubsystem;
 
@@ -34,14 +35,17 @@ public class elevatorCommandTest extends Command {
   private double engagetime;
   private double slowTime;
   private boolean slowTimeCheck;
-  private boolean whileBreak;
+  private double elevatorEncoderValueCheck;
+  private double elevatorEncoderValue;
+  Joystick m_TestJoystick;
 
   /** Creates a new elevatorCommand. */
-  public elevatorCommandTest(ElevatorSubsystem elevatorSubsystem, double motor1position, Joystick elevatorJoystick){
+  public elevatorCommandTest(ElevatorSubsystem elevatorSubsystem, double motor1position, Joystick elevatorJoystick, Joystick testJoystick){
     m_ElevatorSubsystem = elevatorSubsystem;
     addRequirements(m_ElevatorSubsystem);
 
     m_ElevatorJoystick = elevatorJoystick;
+    m_TestJoystick = testJoystick;
 
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -70,8 +74,9 @@ public class elevatorCommandTest extends Command {
   public void execute() {
     TestMotor1Position = m_ElevatorSubsystem.m_TestMotor1.getRotorPosition().getValueAsDouble();
     TestMotor2Position = m_ElevatorSubsystem.m_TestMotor2.getRotorPosition().getValueAsDouble();
+    elevatorEncoderValue = Robot.elevatorEncoder.get();
 
-    error = ((TestMotor1Position+(-2)));
+    error = ((TestMotor1Position+(-4)));
 
     if (errordistance <= .01 && slowTimeCheck){
       slowTime = System.currentTimeMillis();
@@ -81,8 +86,8 @@ public class elevatorCommandTest extends Command {
     }
 
     if(errordistance <= .01 && (System.currentTimeMillis() - slowTime) > 20000 ){
-      m_ElevatorSubsystem.m_TestMotor1.set(0.035);
-      m_ElevatorSubsystem.m_TestMotor2.set(0.035);
+      m_ElevatorSubsystem.m_TestMotor1.set(0.0345);
+      m_ElevatorSubsystem.m_TestMotor2.set(0.0345);
       System.out.println("holding");
       slowTimeCheck = true;
       errordistance = ((error - lastError)) / ((System.currentTimeMillis()-engagetime)/1000);   
@@ -91,12 +96,11 @@ public class elevatorCommandTest extends Command {
     else{
     System.out.println("Business as usual");
 
-    // P = (TestMotor1Position+(-1))*.2
-    // D = (error - lastError)) / ((System.currentTimeMillis()-engagetime)/1000)
-
-    out = (-.025) + ((((TestMotor1Position+-2)))* .035) - ((0.001 * (error - lastError)) / ((System.currentTimeMillis()-engagetime)/1000));//.115 P
+    out = -(((m_ElevatorJoystick.getRawAxis(3) + 1) / 2)*.5);
+    //out = (0) + (((((-elevatorEncoderValue)/1000+-4)))* .2); // ((0.000001 * (((-elevatorEncoderValue)/1000) - ((-elevatorEncoderValueCheck)/1000))) / ((System.currentTimeMillis()-engagetime)/1000));
     m_ElevatorSubsystem.m_TestMotor1.set(-out);
     m_ElevatorSubsystem.m_TestMotor2.set(-out);
+    
 
     //out = (-0.042) + (-(java.lang.Math.sqrt((-TestMotor1Position+2)))* .05) - ((0.001 * (error - lastError)) / ((System.currentTimeMillis()-engagetime)/1000))
 
@@ -105,8 +109,11 @@ public class elevatorCommandTest extends Command {
 
     TestMotor1Position = m_ElevatorSubsystem.m_TestMotor1.getRotorPosition().getValueAsDouble();
     
-    lastError = ((TestMotor1Position+(-2)));
-
+    lastError = ((TestMotor1Position+(-4)));
+    elevatorEncoderValueCheck = Robot.elevatorEncoder.get();
+    
+    SmartDashboard.putNumber("D", (((-elevatorEncoderValue)/1000) - ((-elevatorEncoderValueCheck)/1000)) / ((System.currentTimeMillis()-engagetime)/1000));
+    SmartDashboard.putNumber("Elevator Encoder", elevatorEncoderValue);
     SmartDashboard.putNumber("Power out", out);
     SmartDashboard.putNumber("Test Motor 1 Position", TestMotor1Position);
     SmartDashboard.putNumber("Test Motor 2 Position", TestMotor2Position);
@@ -116,14 +123,15 @@ public class elevatorCommandTest extends Command {
     SmartDashboard.putNumber("Power out", out);
     System.out.println(out);
     SmartDashboard.putNumber("Timer", ((System.currentTimeMillis()-engagetime)/1000));
+    SmartDashboard.putNumber("Elvator Voltage", m_ElevatorSubsystem.m_TestMotor1.getMotorVoltage().getValueAsDouble());
    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_ElevatorSubsystem.m_TestMotor1.set(0.035);
-    m_ElevatorSubsystem.m_TestMotor2.set(0.035);
+    m_ElevatorSubsystem.m_TestMotor1.set(0.0);
+    m_ElevatorSubsystem.m_TestMotor2.set(0.0);
     // m_ElevatorSubsystem.m_TestMotor1.set(0);
     // m_ElevatorSubsystem.m_TestMotor2.set(0);
   }
