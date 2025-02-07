@@ -31,7 +31,7 @@ public class armTestCommand2 extends Command {
   @Override
   public void execute() {
    // m_ArmSubsystem.m_ArmMotor.set(-(((m_ElevatorJoystick.getRawAxis(3) + 1) / 2)*.5));
-    m_ArmSubsystem.m_GrabberMotor.set(-(((m_TestJoystick.getRawAxis(3) + 1) / 2)*.5));
+    m_ArmSubsystem.m_GrabberMotor.set(.4);
   }
 
   // Called once the command ends or is interrupted.

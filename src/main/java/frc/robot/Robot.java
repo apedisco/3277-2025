@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.lang.reflect.Array;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -18,7 +20,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+
+// import com.revrobotics.Rev2mDistanceSensor;
+// import com.revrobotics.Rev2mDistanceSensor.Port;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -28,6 +34,8 @@ public class Robot extends TimedRobot {
   public DoubleLogEntry motor1Position;
 
   private final RobotContainer m_robotContainer;
+  ArmSubsystem m_ArmSubsystem;
+  ElevatorSubsystem m_ElevatorSubsystem;
 
   public double ATag;
 
@@ -35,9 +43,14 @@ public class Robot extends TimedRobot {
   public static DigitalInput input1 = new DigitalInput(1);
   public static DigitalInput input2 = new DigitalInput(2);
   public static DigitalInput input3 = new DigitalInput(3);
+  public static DigitalInput MasterStagingSensor = new DigitalInput(4);
   public static Encoder elevatorEncoder = new Encoder(input0, input1);
   public static DutyCycleEncoder armEncoder = new DutyCycleEncoder(input2);
+  // public static Rev2m
   //public static Encoder armEncoder = new Encoder(input2, input3);
+
+  // private Rev2mDistanceSensor distOnboard; 
+  // private Rev2mDistanceSensor distMXP;
 
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -50,14 +63,22 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+  SmartDashboard.putNumber("Elevator Encoder Value", elevatorEncoder.get());
+  SmartDashboard.putNumber("Arm Encoder Value", armEncoder.get());
     CommandScheduler.getInstance().run(); 
+ 
+  NetworkTable s_table = NetworkTableInstance.getDefault().getTable("limelight-shoot"); 
 
-  NetworkTable s_table = NetworkTableInstance.getDefault().getTable("limelight-shoot");
+  // long[] rotation_array = NetworkTableInstance.getDefault().getTable("limelight-shoot").getEntry("botpose_targetspace").getIntegerArray(new long[6]);
+
+  // long[] rotation_array = s_table.getEntry("camerapose_targetspace").getIntegerArray(new long[6]);
+  NetworkTableEntry cam3d = s_table.getEntry("camerapose_targetspace");
   NetworkTableEntry stx = s_table.getEntry("tx");
   // NetworkTableEntry ty = table.getEntry("ty");
-  // NetworkTableEntry ta = table.getEntry("ta");
+  NetworkTableEntry ta = s_table.getEntry("ta");
   NetworkTableEntry stid = s_table.getEntry("tid");
   NetworkTableEntry stv = s_table.getEntry("tv");
+  //NetworkTableEntry sry = s_table.getEntry("ry");
   //NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
 
   
@@ -66,12 +87,17 @@ public class Robot extends TimedRobot {
   //read values periodically
   double sx = stx.getDouble(0.0);
   // double sy = sty.getDouble(0.0);
-  // double area = ta.getDouble(0.0);
+  double area = ta.getDouble(0.0);
   double said = stid.getDouble(0);
+  double[] rotation = cam3d.getDoubleArray(new double[6]);
   ATag = stv.getDouble(0);
   SmartDashboard.putNumber("ATag Detector", ATag);
   SmartDashboard.putNumber("Limelight", sx);
+  SmartDashboard.putNumber("ATag Area", area);
+  SmartDashboard.putNumber("rotation", rotation[4]);
 
+
+  ATag  = SmartDashboard.getNumber("ATag Detector", 0);
   }
 
   @Override
@@ -106,7 +132,20 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+
+    //  if(distOnboard.isRangeValid()) {
+    //   SmartDashboard.putNumber("Range Onboard", distOnboard.getRange());
+    //   SmartDashboard.putNumber("Timestamp Onboard", distOnboard.getTimestamp());
+    // }
+
+    // if(distMXP.isRangeValid()) {
+    //   SmartDashboard.putNumber("Range MXP", distMXP.getRange());
+    //   SmartDashboard.putNumber("Timestamp MXP", distMXP.getTimestamp());
+    // }
+
+
+  }
 
   @Override
   public void teleopExit() {}

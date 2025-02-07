@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.PointWheelsAt;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -22,6 +23,7 @@ public class TeleReefLinup extends Command {
   private double MaxSpeed = 1;
   private double MaxAngularRate = 1.5 * Math.PI;
   private boolean pathEnabled;
+  private double engagetime;
 
   private SwerveRequest.RobotCentric robotCentric = new SwerveRequest.RobotCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -39,6 +41,7 @@ public class TeleReefLinup extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    engagetime = System.currentTimeMillis();
     ATag = 0;
     pathEnabled = false;
     System.out.println("ReedLinup Int");
@@ -50,16 +53,15 @@ public class TeleReefLinup extends Command {
     ATag  = SmartDashboard.getNumber("ATag Detector", 0);
     xSpeed = SmartDashboard.getNumber("Limelight", 0);
 
-    if (ATag >=1 && ATag <=11){
+    if ((System.currentTimeMillis()-engagetime) < 300){
       System.out.println(ATag);
-
     m_CommandSwerveDrivetrain.setControl( robotCentric
     // .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
     .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.OpenLoopVoltage)
-    .withVelocityX(0)
+    .withVelocityX(0.4)
     .withVelocityY(0)
     .withDeadband(0)
-    .withRotationalRate(-xSpeed* .1));
+    .withRotationalRate(0));//-xSpeed* .1
     
     pathEnabled = true;
   }

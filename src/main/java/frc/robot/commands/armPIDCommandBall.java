@@ -34,7 +34,7 @@ public class armPIDCommandBall extends Command {
   @Override
   public void initialize() {
     engagetime = System.currentTimeMillis();
-    setpoint = .5;
+    setpoint = .7;
     P = .5;
     D = 0;
   }

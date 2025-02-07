@@ -5,7 +5,9 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.subsystems.ArmSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -30,7 +32,14 @@ public class armTestCommand extends Command {
   @Override
   public void execute() {
     //m_ArmSubsystem.m_ArmMotor.set((((m_ElevatorJoystick.getRawAxis(3) + 1) / 2)*.5));
-    m_ArmSubsystem.m_GrabberMotor.set((((m_TestJoystick.getRawAxis(3) + 1) / 2)*.5));
+    if(Robot.MasterStagingSensor.get() == true){
+      m_ArmSubsystem.m_GrabberMotor.set(.7);
+    }
+    if(Robot.MasterStagingSensor.get() == false){
+    m_ArmSubsystem.m_GrabberMotor.set(0);
+    }
+    SmartDashboard.putBoolean("Master Staging Sensor", Robot.MasterStagingSensor.get());
+    
   }
 
   // Called once the command ends or is interrupted.

@@ -12,7 +12,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ArmSubsystem extends SubsystemBase {
   public TalonFX m_ArmMotor = new TalonFX(9);
-  public SparkFlex m_GrabberMotor = new SparkFlex(10, MotorType.kBrushless);
+  //public SparkFlex m_GrabberMotor = new SparkFlex(10, MotorType.kBrushless);
+  public TalonFX m_GrabberMotor = new TalonFX(10);
   /** Creates a new ArmSubsystem. */
   public ArmSubsystem() {}
 

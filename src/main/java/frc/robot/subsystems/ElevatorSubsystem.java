@@ -16,14 +16,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ElevatorSubsystem extends SubsystemBase {
   
-  public TalonFX m_TestMotor1 = new TalonFX(11);
-  public TalonFX m_TestMotor2 = new TalonFX(12);
+  public TalonFX m_ElevatorMotor1 = new TalonFX(11);
+  public TalonFX m_ElevatorMotor2 = new TalonFX(12);
   TalonFXConfiguration toConfigure = new TalonFXConfiguration();
   public int MasterID = 9;
   public boolean OpposeMasterDirection = false;
   public Follower motor2 = new Follower(MasterID, OpposeMasterDirection);
-  public double TestMotor1Position;
-  public double TestMotor2Position;
+  public double ElevatorMotor1Position;
+  public double ElevatorMotor2Position;
   //public StatusCode setControl(Follower request);
   
   
@@ -31,10 +31,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   /** Creates a new ElevatorSubsystem. */
   public ElevatorSubsystem() {
-    // m_TestMotor1.setInverted(true);
-    // m_TestMotor2.setInverted(true);
-    m_TestMotor1.setPosition(0);
-    m_TestMotor2.setPosition(0);
+    // m_ElevatorMotor1.setInverted(true);
+    // m_ElevatorMotor2.setInverted(true);
+    m_ElevatorMotor1.setPosition(0);
+    m_ElevatorMotor2.setPosition(0);
     
 
   
@@ -47,13 +47,17 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   // m_ElevatorMotor1.getConfigurator().apply(toConfigure);
 
-  TestMotor1Position = m_TestMotor1.getRotorPosition().getValueAsDouble();
-  TestMotor2Position = m_TestMotor2.getRotorPosition().getValueAsDouble();
-  SmartDashboard.putNumber("Test Motor 1 Position", TestMotor1Position);
-  SmartDashboard.putNumber("Test Motor 2 Position", TestMotor2Position);
+  ElevatorMotor1Position = m_ElevatorMotor1.getRotorPosition().getValueAsDouble();
+  ElevatorMotor2Position = m_ElevatorMotor2.getRotorPosition().getValueAsDouble();
+  SmartDashboard.putNumber("Elevator Motor 1 Position", ElevatorMotor1Position);
+  SmartDashboard.putNumber("Elevator Motor 2 Position", ElevatorMotor2Position);
   }
   public void elevatorVoltageOut(){
-    m_TestMotor1.getMotorVoltage().getValueAsDouble();
+    m_ElevatorMotor1.getMotorVoltage().getValueAsDouble();
+  }
+  public void elevatorMotors(double power){
+    m_ElevatorMotor1.set(power);
+    m_ElevatorMotor2.set(power);
   }
 
   @Override

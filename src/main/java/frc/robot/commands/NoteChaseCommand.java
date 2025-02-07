@@ -18,7 +18,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class NoteOffsetCommand extends Command {
+public class NoteChaseCommand extends Command {
 
   CommandSwerveDrivetrain m_CommandSwerveDrivetrain;
  // ShootingSubsystem m_ShootingSubsystem;
@@ -29,7 +29,11 @@ public class NoteOffsetCommand extends Command {
   private double ATag;
   private double MaxSpeed = 1;
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+  private double area;
+  private double rotation;
   private double engagetime;
+  private boolean driveCheck;
+
 
   private SwerveRequest.RobotCentric robotCentric = new SwerveRequest.RobotCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -37,7 +41,7 @@ public class NoteOffsetCommand extends Command {
       .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.OpenLoopVoltage);
 
   /** Creates a new NoteOffsetCommand. */
-  public NoteOffsetCommand(CommandSwerveDrivetrain commandSwerveDrivetrain, double Timeout, double ATag) {
+  public NoteChaseCommand(CommandSwerveDrivetrain commandSwerveDrivetrain, double Timeout, double ATag) {
 
     m_CommandSwerveDrivetrain = commandSwerveDrivetrain;
     addRequirements(m_CommandSwerveDrivetrain);
@@ -50,7 +54,7 @@ public class NoteOffsetCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    engagetime = System.currentTimeMillis();
+    driveCheck = true;
     Runtime.reset();
     Runtime.start();
     //m_IntakeSubsystem.setspeed(1.0);
@@ -67,39 +71,61 @@ public class NoteOffsetCommand extends Command {
 
     ATag  = SmartDashboard.getNumber("ATag Detector", 0);
     rotSpeed = SmartDashboard.getNumber("Limelight", 0);
-    yDist = (rotSpeed+12);
+    area = SmartDashboard.getNumber("ATag Area", ATag);
+    rotation = SmartDashboard.getNumber("rotation", 0);
+    yDist = (rotSpeed);
 
     
 
     // RoboPose = m_CommandSwerveDrivetrain.getrobotpose();
-    if ((System.currentTimeMillis()-engagetime) < 500){
+    if (ATag == 1){
 
-      System.out.println(rotSpeed);
-      //System.out.println();
+      System.out.println("ATag 1");
 
     m_CommandSwerveDrivetrain.setControl( robotCentric
     // .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
     .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.OpenLoopVoltage)
-    .withVelocityX(0) //rotSpeed*-.02
-    .withVelocityY(.5)
+    .withVelocityX(1/(area) * 4) //rotSpeed*-.02 java.lang.Math.sqrt
+    .withVelocityY(-yDist*.04)//
     .withDeadband(0)
 
-    .withRotationalRate(0)
-    );
+    .withRotationalRate(rotation*.08));
   }
-  else {
-    System.out.println();
+  if( ATag == 0 && driveCheck == true) {
+    engagetime = System.currentTimeMillis();
+    System.out.println("Clock Start");
+    driveCheck = false;
+  }
+  if( ATag == 0 && driveCheck == false && (System.currentTimeMillis() - engagetime) < 300){
+    System.out.println("Driving forward");
+
+
+    System.out.println((System.currentTimeMillis() - engagetime));
     m_CommandSwerveDrivetrain.setControl( robotCentric
     // .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
     .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.OpenLoopVoltage)
-    .withVelocityX( 0)
+    .withVelocityX( 0.5)
     .withDeadband(0)
     .withVelocityY(0)
     
     
     .withRotationalRate(0)); 
+     }
+    if (ATag == 0 && driveCheck == false && (System.currentTimeMillis()-engagetime) > 300){
+      System.out.println("done");
+      m_CommandSwerveDrivetrain.setControl( robotCentric
+      // .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+      .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.OpenLoopVoltage)
+      .withVelocityX( 0)
+      .withDeadband(0)
+      .withVelocityY(0)
+      
+      
+      .withRotationalRate(0)); 
     }
   }
+  
+  
   
 
   // Called once the command ends or is interrupted.

@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.L3ScoreCommand;
+import frc.robot.commands.NoteChaseCommand;
 import frc.robot.commands.NoteOffsetCommand;
 import frc.robot.commands.TeleReefLinup;
 import frc.robot.commands.armPIDCommand;
@@ -24,6 +26,7 @@ import frc.robot.commands.armPIDCommandBall;
 import frc.robot.commands.armTestCommand;
 import frc.robot.commands.armTestCommand2;
 import frc.robot.commands.elevatorCommandTest;
+import frc.robot.commands.theLebron;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -58,16 +61,17 @@ public class RobotContainer {
          final JoystickButton test3Button = new JoystickButton(m_ElevatorJoystick, 3);
          final JoystickButton test4Button = new JoystickButton(m_ElevatorJoystick, 4);
          final JoystickButton test5Button = new JoystickButton(m_ElevatorJoystick, 5);
+         final JoystickButton test6Button = new JoystickButton(m_ElevatorJoystick, 6);
          final JoystickButton test9Button = new JoystickButton(m_ElevatorJoystick, 9);
          final JoystickButton test10Button = new JoystickButton(m_ElevatorJoystick, 10);
-        //testButton.whileTrue(new elevatorCommand(m_ElevatorSubsystem, MaxAngularRate, m_ElevatorJoystick));
-        //test3Button.whileTrue(new elevatorCommandTest(m_ElevatorSubsystem, MaxAngularRate, m_ElevatorJoystick));//**** 
-        testButton.toggleOnTrue(new elevatorCommandTest(m_ElevatorSubsystem, MaxAngularRate, m_ElevatorJoystick, m_TestJoystick));
-        //test3Button.whileTrue(new elevatorCommand(m_ElevatorSubsystem, MaxAngularRate, m_ElevatorJoystick));
-        test3Button.toggleOnTrue(new armTestCommand(m_ArmSubsystem, m_ElevatorJoystick, m_TestJoystick));
-        test4Button.toggleOnTrue(new armTestCommand2(m_ArmSubsystem, m_ElevatorJoystick, m_TestJoystick));
-        test2Button.whileTrue(new armPIDCommand(m_ArmSubsystem));
-        test5Button.whileTrue(new armPIDCommandBall(m_ArmSubsystem));
+       
+        // testButton.toggleOnTrue(new L3ScoreCommand(m_ArmSubsystem, m_ElevatorSubsystem));
+        // test3Button.toggleOnTrue(new armTestCommand(m_ArmSubsystem, m_ElevatorJoystick, m_TestJoystick));
+        // test4Button.toggleOnTrue(new armTestCommand2(m_ArmSubsystem, m_ElevatorJoystick, m_TestJoystick));
+        // test2Button.toggleOnTrue(new armPIDCommand(m_ArmSubsystem, m_TestJoystick));
+        // test5Button.toggleOnTrue(new armPIDCommandBall(m_ArmSubsystem));
+        // test6Button.whileTrue(new theLebron(m_ArmSubsystem));
+        testButton.whileTrue(new armTestCommand(m_ArmSubsystem, m_ElevatorJoystick, m_TestJoystick));
         
         
 
@@ -90,15 +94,17 @@ public class RobotContainer {
         m_DriveJoystick.button(3).whileTrue(new NoteOffsetCommand(drivetrain, MaxSpeed, MaxAngularRate));
         m_DriveJoystick.button(4).whileTrue(new TeleReefLinup(drivetrain, MaxSpeed, MaxAngularRate));
 
-        m_DriveJoystick.button(6).whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(0))
-        ));
+        // m_DriveJoystick.button(6).whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(90))
+        // ));
+        m_DriveJoystick.button(5).whileTrue(new NoteOffsetCommand(drivetrain, MaxSpeed, MaxAngularRate));
+        m_DriveJoystick.button(6).whileTrue(new NoteChaseCommand(drivetrain, MaxSpeed, MaxAngularRate));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
         // m_DriveJoystick.button(4).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         // m_DriveJoystick.button(5).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        m_DriveJoystick.button(6).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        //m_DriveJoystick.button(6).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // m_DriveJoystick.button(7).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press

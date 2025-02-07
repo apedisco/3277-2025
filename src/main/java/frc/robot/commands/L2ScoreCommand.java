@@ -4,33 +4,34 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class armPIDCommand extends Command {
+public class L2ScoreCommand extends Command {
   ArmSubsystem m_ArmSubsystem;
-  Joystick m_TestJoystick;
   private double armEncoderValue;
   private double armEncoderValueTop;
   private double armEncoderValueBottom;
   private double out;
-  private double setpoint;
+  private double setPointScoring;
+  private double setPointIntaking;
   private double P;
   private double D;
   private double engagetime;
   private double timeTop;
   private double timeBottom;
-  
-  /** Creates a new armPIDCommand. */
-
-  public armPIDCommand(ArmSubsystem armSubsystem, Joystick joystick) {
+  private double elevatorEncoderValue;
+  private double elevatorEncoderValueCheck;
+  private boolean armStop;
+  private boolean stopCheck;
+  private boolean armOn;
+  /** Creates a new L2ScoreCommand. */
+  public L2ScoreCommand(ArmSubsystem armSubsystem) {
     m_ArmSubsystem = armSubsystem;
     addRequirements(m_ArmSubsystem);
-    m_TestJoystick = joystick;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -38,40 +39,59 @@ public class armPIDCommand extends Command {
   @Override
   public void initialize() {
     engagetime = System.currentTimeMillis();
-    setpoint = .22;
+    setPointScoring = .33;
+    setPointIntaking = .22;
     P = 1.5;
     D = 0;
+    stopCheck = true;
+    armStop = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_ArmSubsystem.m_GrabberMotor.set((((m_TestJoystick.getRawAxis(3) + 1) / 2)*.5));
+     armEncoderValue = Robot.armEncoder.get();
+  if (armStop == false){
     System.out.println("armPID Running");
     armEncoderValue = Robot.armEncoder.get();
     armEncoderValueTop = Robot.armEncoder.get();
     timeTop = (System.currentTimeMillis()-engagetime)/1000;
 
-    out = ((setpoint - (((armEncoderValue)))) * P); //(D * ((armEncoderValueBottom)-(armEncoderValueTop))/(timeBottom - timeTop));
+    out = ((setPointScoring - (((armEncoderValue)))) * P); //(D * ((armEncoderValueBottom)-(armEncoderValueTop))/(timeBottom - timeTop));
     m_ArmSubsystem.m_ArmMotor.set(out);
 
     armEncoderValueBottom = Robot.armEncoder.get();
     timeBottom = (System.currentTimeMillis()-engagetime)/1000;
+  }
 
-    SmartDashboard.putNumber("P output", ((setpoint - ((armEncoderValue)/1000)) * P));
-    SmartDashboard.putNumber("D output",(D * ((armEncoderValueBottom)-(armEncoderValueTop))/(timeBottom - timeTop))) ;
-    SmartDashboard.putNumber("Arm Encoder", armEncoderValue);
-    SmartDashboard.putNumber("Power out", out);
-    SmartDashboard.putNumber("Timer", ((System.currentTimeMillis()-engagetime)/1000));
-    SmartDashboard.putNumber("delta Setpoint", (setpoint - (((armEncoderValue)))));
+  if(armEncoderValue > .29 && armEncoderValue < .33 && stopCheck){
+    engagetime = System.currentTimeMillis();
+    stopCheck = false;
+  }
+
+  if(armEncoderValue > .29 && armEncoderValue < .33 && (System.currentTimeMillis() - engagetime <= 300 )){
+    m_ArmSubsystem.m_GrabberMotor.set(8);
+  }
+
+  if(System.currentTimeMillis() - engagetime > 300 && stopCheck == false){
+    armStop = true;
+    System.out.println("armPID Running");
+    armEncoderValue = Robot.armEncoder.get();
+    armEncoderValueTop = Robot.armEncoder.get();
+    timeTop = (System.currentTimeMillis()-engagetime)/1000;
+    
+    out = ((setPointIntaking - (((armEncoderValue)))) * P); //(D * ((armEncoderValueBottom)-(armEncoderValueTop))/(timeBottom - timeTop));
+    m_ArmSubsystem.m_ArmMotor.set(out);
+
+    armEncoderValueBottom = Robot.armEncoder.get();
+    timeBottom = (System.currentTimeMillis()-engagetime)/1000;
+  }
+
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_ArmSubsystem.m_ArmMotor.set(0);
-    m_ArmSubsystem.m_GrabberMotor.set(0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
