@@ -68,22 +68,23 @@ public class elevatorCommandTest extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    out = (-(((m_ElevatorJoystick.getRawAxis(3) + 1) / 2)*.5));
     elevatorEncoderValue = Robot.elevatorEncoder.get();
 
-    error = ((ElevatorMotor1Position - elevatorSetPoint));
-    System.out.println("Business as usual");
+    // error = ((ElevatorMotor1Position - elevatorSetPoint));
+    // System.out.println("Business as usual");
 
 
-    out = (0) + ((((elevatorEncoderValue)/1000) - elevatorSetPoint)* .2); // ((0.000001 * (((-elevatorEncoderValue)/1000) - ((-elevatorEncoderValueCheck)/1000))) / ((System.currentTimeMillis()-engagetime)/1000));
-    m_ElevatorSubsystem.elevatorMotors(-out);
+    // out = (0) + ((((elevatorEncoderValue)/1000) - elevatorSetPoint)* .2); // ((0.000001 * (((-elevatorEncoderValue)/1000) - ((-elevatorEncoderValueCheck)/1000))) / ((System.currentTimeMillis()-engagetime)/1000));
+     m_ElevatorSubsystem.elevatorMotors(-out);
 
-    errordistance = ((error - lastError)) / ((System.currentTimeMillis()-engagetime)/1000);
-    SmartDashboard.putNumber("Error Difference", errordistance);
+    // errordistance = ((error - lastError)) / ((System.currentTimeMillis()-engagetime)/1000);
+    // SmartDashboard.putNumber("Error Difference", errordistance);
 
-    ElevatorMotor1Position = m_ElevatorSubsystem.m_ElevatorMotor1.getRotorPosition().getValueAsDouble();
+    // ElevatorMotor1Position = m_ElevatorSubsystem.m_ElevatorMotor1.getRotorPosition().getValueAsDouble();
     
-    lastError = ((ElevatorMotor1Position+(-2)));
-    elevatorEncoderValueCheck = Robot.elevatorEncoder.get();
+    // lastError = ((ElevatorMotor1Position+(-2)));
+    // elevatorEncoderValueCheck = Robot.elevatorEncoder.get();
     
     SmartDashboard.putNumber("D", (((-elevatorEncoderValue)/1000) - ((-elevatorEncoderValueCheck)/1000)) / ((System.currentTimeMillis()-engagetime)/1000));
     SmartDashboard.putNumber("Elevator Encoder", elevatorEncoderValue);

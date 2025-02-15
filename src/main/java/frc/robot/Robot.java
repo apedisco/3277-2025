@@ -6,6 +6,8 @@ package frc.robot;
 
 import java.lang.reflect.Array;
 
+import com.revrobotics.jni.DistanceSensorJNIWrapper;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -37,15 +39,28 @@ public class Robot extends TimedRobot {
   ArmSubsystem m_ArmSubsystem;
   ElevatorSubsystem m_ElevatorSubsystem;
 
-  public double ATag;
+  public double l_ATag;
+  public double r_ATag;
+  public double r_limeLightMountingDegrees = 0;
+  public double r_limeLightHeightOffset = 9.8125;
+  public double goalHeightInches = 12.125;
+  public double r_angleToGoalDegrees;
+  public double r_angleToGoalRadians;
+  public double r_distanceFromLimelightToGoalInches;
 
   public static DigitalInput input0 = new DigitalInput(0);
   public static DigitalInput input1 = new DigitalInput(1);
   public static DigitalInput input2 = new DigitalInput(2);
   public static DigitalInput input3 = new DigitalInput(3);
   public static DigitalInput MasterStagingSensor = new DigitalInput(4);
+  public static DigitalInput input5 = new DigitalInput(5);
+  public static DigitalInput input6 = new DigitalInput(6);
+  public static DigitalInput input7 = new DigitalInput(7);
+  public static DigitalInput input8 = new DigitalInput(8);
+  public static DigitalInput input9 = new DigitalInput(9);
+ 
   public static Encoder elevatorEncoder = new Encoder(input0, input1);
-  public static DutyCycleEncoder armEncoder = new DutyCycleEncoder(input2);
+  public static DutyCycleEncoder armEncoder = new DutyCycleEncoder(input5);
   // public static Rev2m
   //public static Encoder armEncoder = new Encoder(input2, input3);
 
@@ -66,38 +81,61 @@ public class Robot extends TimedRobot {
   SmartDashboard.putNumber("Elevator Encoder Value", elevatorEncoder.get());
   SmartDashboard.putNumber("Arm Encoder Value", armEncoder.get());
     CommandScheduler.getInstance().run(); 
+
+    //System.out.println(input8.get());
  
-  NetworkTable s_table = NetworkTableInstance.getDefault().getTable("limelight-shoot"); 
+  // Networktable and variables for the right Limelight
+  NetworkTable r_table = NetworkTableInstance.getDefault().getTable("limelight-right"); 
 
-  // long[] rotation_array = NetworkTableInstance.getDefault().getTable("limelight-shoot").getEntry("botpose_targetspace").getIntegerArray(new long[6]);
-
-  // long[] rotation_array = s_table.getEntry("camerapose_targetspace").getIntegerArray(new long[6]);
-  NetworkTableEntry cam3d = s_table.getEntry("camerapose_targetspace");
-  NetworkTableEntry stx = s_table.getEntry("tx");
-  // NetworkTableEntry ty = table.getEntry("ty");
-  NetworkTableEntry ta = s_table.getEntry("ta");
-  NetworkTableEntry stid = s_table.getEntry("tid");
-  NetworkTableEntry stv = s_table.getEntry("tv");
-  //NetworkTableEntry sry = s_table.getEntry("ry");
+  NetworkTableEntry r_cam3d = r_table.getEntry("camerapose_targetspace");
+  NetworkTableEntry r_tx = r_table.getEntry("tx");
+  NetworkTableEntry r_ty = r_table.getEntry("ty");
+  NetworkTableEntry r_ta = r_table.getEntry("ta");
+  NetworkTableEntry r_tid = r_table.getEntry("tid");
+  NetworkTableEntry r_tv = r_table.getEntry("tv");
+  //NetworkTableEntry r_ry = r_table.getEntry("ry");
   //NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
-
-  
-  
-  //System.out.println((m_DriveJoystick.getRawAxis(3) + 1) / 2);
   //read values periodically
-  double sx = stx.getDouble(0.0);
-  // double sy = sty.getDouble(0.0);
-  double area = ta.getDouble(0.0);
-  double said = stid.getDouble(0);
-  double[] rotation = cam3d.getDoubleArray(new double[6]);
-  ATag = stv.getDouble(0);
-  SmartDashboard.putNumber("ATag Detector", ATag);
-  SmartDashboard.putNumber("Limelight", sx);
-  SmartDashboard.putNumber("ATag Area", area);
+  double r_sx = r_tx.getDouble(0.0);
+  double r_sy = r_ty.getDouble(0.0);
+  double r_area = r_ta.getDouble(0.0);
+  double r_aid = r_tid.getDouble(0);
+  double[] r_rotation = r_cam3d.getDoubleArray(new double[6]);
+  r_ATag = r_tv.getDouble(0);
+  SmartDashboard.putNumber("r_X-Offset", r_sx);
+  SmartDashboard.putNumber("ATag Detector", r_ATag);
+  SmartDashboard.putNumber("Limelight", r_sx);
+  SmartDashboard.putNumber("ATag Area", r_area);
+  SmartDashboard.putNumber("rotation", r_rotation[4]);
+
+  r_angleToGoalDegrees = r_limeLightMountingDegrees + r_sy;
+  r_angleToGoalRadians = r_angleToGoalDegrees * (3.14159 / 180);
+
+  r_distanceFromLimelightToGoalInches = (goalHeightInches - r_limeLightHeightOffset) / Math.tan(r_angleToGoalRadians);
+  SmartDashboard.putNumber("Distance from Limelight-right to ATag", r_distanceFromLimelightToGoalInches);
+
+  // Networktable and variables for the left Limelight
+  NetworkTable l_table = NetworkTableInstance.getDefault().getTable("limelight-left");
+  
+  NetworkTableEntry l_cam3d = l_table.getEntry("camerapose_targetspace");
+  NetworkTableEntry l_tx = l_table.getEntry("tx");
+  NetworkTableEntry l_ty = l_table.getEntry("ty");
+  NetworkTableEntry l_ta = l_table.getEntry("ta");
+  NetworkTableEntry l_tid = l_table.getEntry("tid");
+  NetworkTableEntry l_tv = l_table.getEntry("tv");
+  //NetworkTableEntry r_ry = l_table.getEntry("ry");
+  //NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
+  //read values periodically
+  double l_sx = l_tx.getDouble(0.0);
+  double l_sy = l_ty.getDouble(0.0);
+  double l_area = l_ta.getDouble(0.0);
+  double l_aid = l_tid.getDouble(0);
+  double[] rotation = l_cam3d.getDoubleArray(new double[6]);
+  l_ATag = r_tv.getDouble(0);
+  SmartDashboard.putNumber("ATag Detector", l_ATag);
+  SmartDashboard.putNumber("Limelight", l_sx);
+  SmartDashboard.putNumber("ATag Area", l_area);
   SmartDashboard.putNumber("rotation", rotation[4]);
-
-
-  ATag  = SmartDashboard.getNumber("ATag Detector", 0);
   }
 
   @Override

@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ArmSubsystem;
@@ -25,13 +27,15 @@ public class armTestCommand2 extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_ArmSubsystem.m_GrabberMotor.setNeutralMode(NeutralModeValue.Brake);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-   // m_ArmSubsystem.m_ArmMotor.set(-(((m_ElevatorJoystick.getRawAxis(3) + 1) / 2)*.5));
-    m_ArmSubsystem.m_GrabberMotor.set(.4);
+    //m_ArmSubsystem.m_ArmMotor.set(-(((m_ElevatorJoystick.getRawAxis(3) + 1) / 2)*.5));
+    m_ArmSubsystem.m_GrabberMotor.set(-(((m_ElevatorJoystick.getRawAxis(3) + 1) / 2)*.5));
   }
 
   // Called once the command ends or is interrupted.

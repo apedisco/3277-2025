@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,19 +28,22 @@ public class armTestCommand extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_ArmSubsystem.m_GrabberMotor.setNeutralMode(NeutralModeValue.Brake);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_ArmSubsystem.m_GrabberMotor.set((((m_ElevatorJoystick.getRawAxis(3) + 1) / 2)*.5));
     //m_ArmSubsystem.m_ArmMotor.set((((m_ElevatorJoystick.getRawAxis(3) + 1) / 2)*.5));
-    if(Robot.MasterStagingSensor.get() == true){
-      m_ArmSubsystem.m_GrabberMotor.set(.7);
-    }
-    if(Robot.MasterStagingSensor.get() == false){
-    m_ArmSubsystem.m_GrabberMotor.set(0);
-    }
-    SmartDashboard.putBoolean("Master Staging Sensor", Robot.MasterStagingSensor.get());
+    // if(Robot.MasterStagingSensor.get() == true){
+    //   m_ArmSubsystem.m_GrabberMotor.set(.3);
+    // }
+    // if(Robot.MasterStagingSensor.get() == false){
+    // m_ArmSubsystem.m_GrabberMotor.set(0);
+    // }
+    // SmartDashboard.putBoolean("Master Staging Sensor", Robot.MasterStagingSensor.get());
     
   }
 
